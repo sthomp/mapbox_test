@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script src='https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.js'></script>
+  <link href='https://api.mapbox.com/mapbox-gl-js/v0.39.1/mapbox-gl.css' rel='stylesheet' />
+</head>
+<body>
+
+<div id='map' style='width: 400px; height: 300px;'></div>
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1Ijoic3Rob21wc29uc25hcCIsImEiOiJjajVhNWhha3YwNDJuMzJyeTAyNWZ1c2NvIn0.mv6khDVD6rG5TH582DVCNg';
+  var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/streets-v9'
+  });
+
+  function zoomToData() {
+    map.fitBounds([
+      [-94.59698978704931, 39.09175181816872],
+      [-94.54646246532076, 39.103904834660455]]);
+  }
+
+  async function loadData(url) {
+    const geoJson = await fetch(url, {method: 'get'}).then((res) => {
+      return res.json();
+    });
+
+    map.addSource('my-source', { type: 'geojson', data: geoJson });
+    map.addLayer({
+      id: 'my-layer',
+      type: 'circle',
+      source: 'my-source',
+      paint: {
+        'circle-color': '#f23c57',
+        'circle-radius': 4,
+      }
+    });
+
+    setTimeout(zoomToData, 1000);
+  }
+
+  map.on('load', function() {
+    const geojsonUrl = 'https://rawgit.com/sthomp/mapbox_test/master/geojson.json';
+    loadData(geojsonUrl);
+  });
+
+
+</script>
+
+</body>
+</html>
