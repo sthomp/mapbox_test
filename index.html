@@ -27,15 +27,43 @@
       return res.json();
     });
 
-    map.addSource('my-source', { type: 'geojson', data: geoJson });
+    map.addSource('my-source', {
+      type: 'geojson',
+      data: geoJson,
+      buffer: 0,
+      cluster: true,
+      clusterMaxZoom: 12,
+      clusterRadius: 20,
+      maxzoom: 12,
+    });
+    map.addLayer({
+      id: 'my-layer-cluster',
+      type: 'circle',
+      "maxzoom": 12,
+      source: 'my-source',
+      paint: {
+        'circle-color': 'blue',
+        'circle-radius': {
+          "property": "point_count",
+          "stops": [[0,10], [5000, 30]]
+        }
+      },
+      filter: ["has", "point_count"]
+    });
+
     map.addLayer({
       id: 'my-layer',
+      "minzoom": 12,
       type: 'circle',
       source: 'my-source',
       paint: {
         'circle-color': '#f23c57',
-        'circle-radius': 4,
-      }
+        'circle-radius': {
+          "stops": [[12,2], [22,6]]
+        },
+        "circle-stroke-width": 0.2
+      },
+      filter: ["!has", "point_count"]
     });
 
     setTimeout(zoomToData, 1000);
